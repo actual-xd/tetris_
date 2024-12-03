@@ -3,9 +3,6 @@ package ru.guu.tetris;
 import java.util.Arrays;
 import java.util.List;
 
-/**
- * @author Almas Baimagambetov (almaslvl@gmail.com)
- */
 public class Piece {
 
     public int distance;

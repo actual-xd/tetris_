@@ -1,15 +1,14 @@
 package ru.guu.tetris;
 
-/**
- * @author Almas Baimagambetov (almaslvl@gmail.com)
- */
+
 public enum Direction {
     UP(0, -1),
     RIGHT(1, 0),
     DOWN(0, 1),
     LEFT(-1, 0);
 
-    int x, y;
+    final int x;
+    final int y;
 
     Direction(int x, int y) {
         this.x = x;

@@ -2,6 +2,7 @@ package ru.guu.tetris;
 
 import javafx.animation.AnimationTimer;
 import javafx.application.Application;
+import javafx.scene.control.Label;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.canvas.Canvas;
@@ -11,6 +12,8 @@ import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
@@ -22,14 +25,16 @@ public class TetrisApp extends Application {
     public static final int TILE_SIZE = 40;
     public static final int GRID_WIDTH = 15;
     public static final int GRID_HEIGHT = 20;
+    private int score = 0;
 
     private double time;
     private GraphicsContext g;
 
-    private int[][] grid = new int[GRID_WIDTH][GRID_HEIGHT];
 
-    private List<Tetromino> original = new ArrayList<>();
-    private List<Tetromino> tetrominos = new ArrayList<>();
+    private final int[][] grid = new int[GRID_WIDTH][GRID_HEIGHT];
+
+    private final List<Tetromino> original = new ArrayList<>();
+    private final List<Tetromino> tetrominos = new ArrayList<>();
 
     private Tetromino selected;
 
@@ -79,6 +84,7 @@ public class TetrisApp extends Application {
                     render();
                     time = 0;
                 }
+
             }
         };
         timer.start();
@@ -86,14 +92,46 @@ public class TetrisApp extends Application {
         return root;
     }
 
+    public void checkGameOver() {
+        if (!isValidState()) {
+            gameOver();
+        }
+    }
+
+    private void gameOver() {
+
+        try {
+            java.time.LocalDate currentDate = java.time.LocalDate.now();
+            FileWriter writer = new FileWriter("score.txt", true);
+            writer.write(currentDate + ", " + score + " очков\n");
+            writer.close();
+            System.out.println("Очки записаны в файл score.txt");
+            System.exit(0);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
     private void update() {
         makeMove(p -> p.move(Direction.DOWN), p -> p.move(Direction.UP), true);
+        checkGameOver();
     }
 
     private void render() {
         g.clearRect(0, 0, GRID_WIDTH * TILE_SIZE, GRID_HEIGHT * TILE_SIZE);
 
         tetrominos.forEach(p -> p.draw(g));
+        g.setStroke(Color.GRAY);
+        g.setLineWidth(0.5);
+
+
+        for (int x = 0; x < GRID_WIDTH; x++) {
+            g.strokeLine(x * TILE_SIZE, 0, x * TILE_SIZE, GRID_HEIGHT * TILE_SIZE);
+        }
+
+        for (int y = 0; y < GRID_HEIGHT; y++) {
+            g.strokeLine(0, y * TILE_SIZE, GRID_WIDTH * TILE_SIZE, y * TILE_SIZE);
+        }
     }
 
     private void placePiece(Piece piece) {
@@ -157,6 +195,7 @@ public class TetrisApp extends Application {
 
     private void sweep() {
         List<Integer> rows = sweepRows();
+        score += rows.size();
         rows.forEach(row -> {
             for (int x = 0; x < GRID_WIDTH; x++) {
                 for (Tetromino tetromino : tetrominos) {
@@ -180,6 +219,7 @@ public class TetrisApp extends Application {
         });
 
         spawn();
+
     }
 
     private List<Integer> sweepRows() {
@@ -208,10 +248,6 @@ public class TetrisApp extends Application {
         tetrominos.add(tetromino);
         tetromino.pieces.forEach(this::placePiece);
 
-        if (!isValidState()) {
-            System.out.println("Game Over");
-            System.exit(0);
-        }
     }
 
     @Override
@@ -228,7 +264,6 @@ public class TetrisApp extends Application {
             } else if (e.getCode() == KeyCode.DOWN) {
                 makeMove(p -> p.move(Direction.DOWN), p -> p.move(Direction.UP), true);
             }
-
             render();
         });
 
