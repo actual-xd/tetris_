@@ -232,7 +232,6 @@ public class TetrisApp extends Application {
                     continue outer;
                 }
             }
-
             rows.add(y);
         }
 
@@ -242,12 +241,9 @@ public class TetrisApp extends Application {
     private void spawn() {
         Tetromino tetromino = original.get(new Random().nextInt(original.size())).copy();
         tetromino.move(GRID_WIDTH / 2, 0);
-
         selected = tetromino;
-
         tetrominos.add(tetromino);
         tetromino.pieces.forEach(this::placePiece);
-
     }
 
     @Override

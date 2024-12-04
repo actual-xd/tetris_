@@ -10,9 +10,6 @@ import java.util.stream.Collectors;
 
 import static ru.guu.tetris.TetrisApp.TILE_SIZE;
 
-/**
- * @author Almas Baimagambetov (almaslvl@gmail.com)
- */
 public class Tetromino {
 
     public int x, y;
